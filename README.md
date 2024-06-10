@@ -30,6 +30,7 @@ The main change therefore is adding a hook "Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG" 
         );
         return this.beforeRemoveLiquidity.selector;
     }
+```
 
 Here before the IPoolManager can modify the liquidity params, it needs to check if the lock-up period has elapsed
 
