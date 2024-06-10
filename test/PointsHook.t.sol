@@ -242,39 +242,39 @@ contract TestPointsHook is Test, Deployers {
         );
     }
 
-//     function test_addLiquidityWithoutNFT() public {
-//         bytes memory hookData = hook.getHookData(address(0), address(this));
+    // function test_addLiquidityWithoutNFT() public {
+    //     bytes memory hookData = hook.getHookData(address(0), address(this));
 
-//         vm.expectRevert("MissingLiquidityLicense");
-//         modifyLiquidityRouter.modifyLiquidity{value: 0.003 ether}(
-//             key,
-//             IPoolManager.ModifyLiquidityParams({
-//                 tickLower: -60,
-//                 tickUpper: 60,
-//                 liquidityDelta: 1 ether,
-//                 salt: 0
-//             }),
-//             hookData
-//         );
-//     }
+    //     vm.expectRevert("MissingLiquidityLicense");
+    //     modifyLiquidityRouter.modifyLiquidity{value: 0.003 ether}(
+    //         key,
+    //         IPoolManager.ModifyLiquidityParams({
+    //             tickLower: -60,
+    //             tickUpper: 60,
+    //             liquidityDelta: 1 ether,
+    //             salt: 0
+    //         }),
+    //         hookData
+    //     );
+    // }
 
-//     function test_addLiquidityWithNFT() public {
-//         bytes memory hookData = hook.getHookData(address(0), address(this));
-//         loyaltyCredentials.mintLiquidityLicense(address(this)); // Mint the required liquidity NFT
-//         // loyaltyCredentials.mintTradingCredential(address(this)); // Mint the required trading NFT
+    // function test_addLiquidityWithNFT() public {
+    //     bytes memory hookData = hook.getHookData(address(0), address(this));
+    //     loyaltyCredentials.mintLiquidityLicense(address(this)); // Mint the required liquidity NFT
+    //     // loyaltyCredentials.mintTradingCredential(address(this)); // Mint the required trading NFT
 
-//         modifyLiquidityRouter.modifyLiquidity{value: 0.003 ether}(
-//             key,
-//             IPoolManager.ModifyLiquidityParams({
-//                 tickLower: -60,
-//                 tickUpper: 60,
-//                 liquidityDelta: 1 ether,
-//                 salt: 0
-//             }),
-//             hookData
-//         );
+    //     modifyLiquidityRouter.modifyLiquidity{value: 0.003 ether}(
+    //         key,
+    //         IPoolManager.ModifyLiquidityParams({
+    //             tickLower: -60,
+    //             tickUpper: 60,
+    //             liquidityDelta: 1 ether,
+    //             salt: 0
+    //         }),
+    //         hookData
+    //     );
 
-//         uint256 pointsBalanceAfterAddLiquidity = hook.balanceOf(address(this));
-//         assert(pointsBalanceAfterAddLiquidity > 0);
-//     }
+    //     uint256 pointsBalanceAfterAddLiquidity = hook.balanceOf(address(this));
+    //     assert(pointsBalanceAfterAddLiquidity > 0);
+    // }
 }

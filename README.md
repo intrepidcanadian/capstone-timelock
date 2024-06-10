@@ -81,11 +81,13 @@ Here before the IPoolManager can modify the liquidity params, it needs to check 
     }
 ```
 
-
 ### Test Results
 
 ![Test Results](./test/TestScreenShot.png)
 
+### Additional Code
+
+In addition to this, the repo attempts to add 2 more hooks (beforeSwap and beforeAddLiquidity). These hooks are copied over from the Amulet/Pirate Chest repos in Uniswap academy where I thought they essentially could be KYC users or licensed liquidity providers. These have been commented out in the code as they have not been fully integrated. 
 
 ## Foundry
 

@@ -53,10 +53,10 @@ contract PointsHook is BaseHook, ERC20 {
         }
     
     /// ensure it is only the qualified PoolOperator
-    // modifier poolOperatorOnly(address sender) {
-    //     if (sender != address(allowedPoolOperator)) revert NotPoolOperator();
-    //     _;
-    // }
+    modifier poolOperatorOnly(address sender) {
+        if (sender != address(allowedPoolOperator)) revert NotPoolOperator();
+        _;
+    }
 
     function getHookPermissions()
         public
@@ -68,12 +68,14 @@ contract PointsHook is BaseHook, ERC20 {
             Hooks.Permissions({
                 beforeInitialize: false,
                 afterInitialize: false,
+
                 // to-do> for role-based permissions to change beforeAddLiquidity to true
                 beforeAddLiquidity: false,
                 // added hook permissions for before removing liquidity
                 beforeRemoveLiquidity: true,
                 afterAddLiquidity: true,
                 afterRemoveLiquidity: false,
+
                 // to do> added hook permissions for needing the trading license to trade to true
                 beforeSwap: false,
                 afterSwap: true,
@@ -90,7 +92,7 @@ contract PointsHook is BaseHook, ERC20 {
 
     // function beforeSwap(
     //     address sender,
-    //     PoolKey calldata,
+    //     PoolKey calldata key,
     //     IPoolManager.SwapParams calldata,
     //     bytes calldata hookData
     // ) external view override returns (bytes4) {
@@ -103,13 +105,15 @@ contract PointsHook is BaseHook, ERC20 {
     //     if (loyaltyCredentials.balanceOf(user, TRADING_CREDENTIAL) == 0) {
     //         revert MissingTradingCredentials();
     //     }
+
+    //     return this.beforeSwap.selector;
     // }
 
-    // // added a beforeAddLiquidity for the liquidity licensing credentials check
+    // // // added a beforeAddLiquidity for the liquidity licensing credentials check
 
     // function beforeAddLiquidity(
     //     address sender,
-    //     PoolKey calldata,
+    //     PoolKey calldata key,
     //     IPoolManager.ModifyLiquidityParams calldata,
     //     bytes calldata hookData
     // ) external view override returns (bytes4) {
@@ -122,6 +126,7 @@ contract PointsHook is BaseHook, ERC20 {
     //     if (loyaltyCredentials.balanceOf(user, LIQUIDITY_LICENSE) == 0) {
     //         revert MissingLiquidityLicense();
     //     }
+    //     return this.beforeAddLiquidity.selector;
     // }
 
     // function _getUserAddress(
