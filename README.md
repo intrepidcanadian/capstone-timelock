@@ -2,9 +2,7 @@
 
 # Video
 
-<div align="center">
-    <iframe width="560" height="315" src="https://www.loom.com/share/27e4d7bffc7b4abe904be573f6b24444" frameborder="0" allowfullscreen></iframe>
-</div>
+[Video](https://www.loom.com/share/27e4d7bffc7b4abe904be573f6b24444)
 
 For the capstone project, I decided to add a simple time lock to adding liquidity to the loyalty example provided to us in the course.
 
