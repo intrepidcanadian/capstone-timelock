@@ -1,10 +1,21 @@
-## Capstone Project
+## Capstone Project - Time-Locked Liquidity
 
 For the capstone project, I decided to add a time lock to adding liquidity to the pool.
 
 This is because in the original repo for issuing points, points can be issued without the lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
 
-The main change therfore is adding a hook "Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG" to check if the lock-up period has elapsed before removing liquidity.
+### Before Remove Liquidity Flag
+
+The main change therefore is adding a hook "Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG" to check if the lock-up period has elapsed before removing liquidity.
+
+### Solidity Addition to POINTS Contract
+
+```solidity
+// **** added for minimum lock-up period
+    uint256 public constant MINIMUM_LOCKUP_TIME = 7 days; 
+```
+
+
 
 
 

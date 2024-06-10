@@ -39,7 +39,6 @@ contract PointsHook is BaseHook, ERC20 {
 
     // **** added for minimum lock-up period
     uint256 public constant MINIMUM_LOCKUP_TIME = 7 days; 
-
     uint256 public constant POINTS_FOR_REFERRAL = 500 * 10 ** 18;
 
     constructor(
@@ -106,9 +105,9 @@ contract PointsHook is BaseHook, ERC20 {
     //     }
     // }
 
-    // // added a beforemodify for the liquidity licensing credentials check
+    // // added a beforeAddLiquidity for the liquidity licensing credentials check
 
-    // function beforeModifyPosition(
+    // function beforeAddLiquidity(
     //     address sender,
     //     PoolKey calldata,
     //     IPoolManager.ModifyLiquidityParams calldata,
