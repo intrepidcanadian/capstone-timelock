@@ -1,8 +1,8 @@
 ## Capstone Project - Time-Locked Liquidity
 
-For the capstone project, I decided to add a time lock to adding liquidity to the pool.
+For the capstone project, I decided to add a simple time lock to adding liquidity to the pool.
 
-This is because in the original repo for issuing points, points can be issued without the lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
+This is because in the original repo for issuing points, it was remarked that points can be abused without a period of time for lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
 
 ### Before Remove Liquidity Flag
 
@@ -11,15 +11,79 @@ The main change therefore is adding a hook "Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG" 
 ### Solidity Addition to POINTS Contract
 
 ```solidity
-// **** added for minimum lock-up period
+// added to track time stamp of when liquidity is added
+    mapping(address => uint256) public liquidityAddedTimestamp;
+// added for minimum lock-up period
     uint256 public constant MINIMUM_LOCKUP_TIME = 7 days; 
+// for hook permissions, set to true for beforeRemoveLiquidity: true,
+
+// one added function
+   function beforeRemoveLiquidity(
+        address sender,
+        PoolKey calldata,
+        IPoolManager.ModifyLiquidityParams calldata,
+        bytes calldata
+    ) external view override returns (bytes4) {
+        require(
+            block.timestamp >= liquidityAddedTimestamp[sender] + MINIMUM_LOCKUP_TIME,
+            "Liquidity is still locked"
+        );
+        return this.beforeRemoveLiquidity.selector;
+    }
+
+Here before the IPoolManager can modify the liquidity params, it needs to check if the lock-up period has elapsed
+
+### Testing
+
+```solidity
+    function test_lockUpPeriod() public {
+        bytes memory hookData = hook.getHookData(address(0), address(this));
+
+        modifyLiquidityRouter.modifyLiquidity{value: 0.003 ether}(
+            key,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: -60,
+                tickUpper: 60,
+                liquidityDelta: 1 ether,
+                salt: 0
+            }),
+            hookData
+        );
+
+        // Attempt to remove liquidity before the lock-up period ends
+        vm.expectRevert("Liquidity is still locked");
+        modifyLiquidityRouter.modifyLiquidity(
+            key,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: -60,
+                tickUpper: 60,
+                liquidityDelta: -1 ether,
+                salt: 0
+            }),
+            hookData
+        );
+
+        // Warp forward in time to surpass the lock-up period
+        vm.warp(block.timestamp + hook.MINIMUM_LOCKUP_TIME() + 1);
+
+        // Now attempt to remove liquidity after the lock-up period ends
+        modifyLiquidityRouter.modifyLiquidity(
+            key,
+            IPoolManager.ModifyLiquidityParams({
+                tickLower: -60,
+                tickUpper: 60,
+                liquidityDelta: -1 ether,
+                salt: 0
+            }),
+            hookData
+        );
+    }
 ```
 
 
+### Test Results
 
-
-
-
+![Test Results](./test/TestScreenShot.png)
 
 
 ## Foundry
