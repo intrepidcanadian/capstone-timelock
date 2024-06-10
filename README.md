@@ -1,5 +1,11 @@
 ## Capstone Project - Time-Locked Liquidity
 
+# Video
+
+<div align="center">
+    <iframe width="560" height="315" src="https://www.loom.com/share/27e4d7bffc7b4abe904be573f6b24444" frameborder="0" allowfullscreen></iframe>
+</div>
+
 For the capstone project, I decided to add a simple time lock to adding liquidity to the loyalty example provided to us in the course.
 
 This is because in the original repo (Hardik's repo) for issuing points, it was remarked that points can be abused without a period of time for lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
