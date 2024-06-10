@@ -1,8 +1,8 @@
 ## Capstone Project - Time-Locked Liquidity
 
-For the capstone project, I decided to add a simple time lock to adding liquidity to the pool.
+For the capstone project, I decided to add a simple time lock to adding liquidity to the loyalty example provided to us in the course.
 
-This is because in the original repo for issuing points, it was remarked that points can be abused without a period of time for lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
+This is because in the original repo (Hardik's repo) for issuing points, it was remarked that points can be abused without a period of time for lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
 
 ### Before Remove Liquidity Flag
 
