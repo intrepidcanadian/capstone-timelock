@@ -1,3 +1,16 @@
+## Capstone Project
+
+For the capstone project, I decided to add a time lock to adding liquidity to the pool.
+
+This is because in the original repo for issuing points, points can be issued without the lock-up, allowing for abuse (i.e. people can add liquidity, remove, and add again).
+
+The main change therfore is adding a hook "Hooks.BEFORE_REMOVE_LIQUIDITY_FLAG" to check if the lock-up period has elapsed before removing liquidity.
+
+
+
+
+
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**

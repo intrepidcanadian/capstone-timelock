@@ -12,11 +12,33 @@ import {IPoolManager} from "v4-core/interfaces/IPoolManager.sol";
 
 import {Hooks} from "v4-core/libraries/Hooks.sol";
 
+// Added for Credentials NFT
+import {IERC1155} from "openzeppelin-contracts/contracts/token/ERC1155/IERC1155.sol";
+
+
 contract PointsHook is BaseHook, ERC20 {
+    error MissingLiquidityLicense();
+    error MissingTradingCredentials();
+    error NotPoolOperator();
+
     using CurrencyLibrary for Currency;
     using BalanceDeltaLibrary for BalanceDelta;
 
     mapping(address => address) public referredBy;
+
+    // **** added to track time stamp of when liquidity is added
+    mapping(address => uint256) public liquidityAddedTimestamp;
+
+    // **** added for NFT credentials
+    IERC1155 immutable loyaltyCredentials;
+    address allowedPoolOperator;
+
+    /// Liquidity License allows to perform modifyPosition operations while Trading Credentials allow to swap
+    uint256 public constant LIQUIDITY_LICENSE = 1;
+    uint256 public constant TRADING_CREDENTIAL = 2;
+
+    // **** added for minimum lock-up period
+    uint256 public constant MINIMUM_LOCKUP_TIME = 7 days; 
 
     uint256 public constant POINTS_FOR_REFERRAL = 500 * 10 ** 18;
 
@@ -24,7 +46,18 @@ contract PointsHook is BaseHook, ERC20 {
         IPoolManager _manager,
         string memory _name,
         string memory _symbol
-    ) BaseHook(_manager) ERC20(_name, _symbol, 18) {}
+        // address _loyaltyCredentials,
+        // address _allowedPoolOperator
+    ) BaseHook(_manager) ERC20(_name, _symbol, 18) {
+        // allowedPoolOperator = _allowedPoolOperator;
+        // loyaltyCredentials = IERC1155(_loyaltyCredentials);
+        }
+    
+    /// ensure it is only the qualified PoolOperator
+    // modifier poolOperatorOnly(address sender) {
+    //     if (sender != address(allowedPoolOperator)) revert NotPoolOperator();
+    //     _;
+    // }
 
     function getHookPermissions()
         public
@@ -36,10 +69,13 @@ contract PointsHook is BaseHook, ERC20 {
             Hooks.Permissions({
                 beforeInitialize: false,
                 afterInitialize: false,
+                // to-do> for role-based permissions to change beforeAddLiquidity to true
                 beforeAddLiquidity: false,
-                beforeRemoveLiquidity: false,
+                // added hook permissions for before removing liquidity
+                beforeRemoveLiquidity: true,
                 afterAddLiquidity: true,
                 afterRemoveLiquidity: false,
+                // to do> added hook permissions for needing the trading license to trade to true
                 beforeSwap: false,
                 afterSwap: true,
                 beforeDonate: false,
@@ -50,6 +86,52 @@ contract PointsHook is BaseHook, ERC20 {
                 afterRemoveLiquidityReturnDelta: false
             });
     }
+
+    // added a beforeSwap for the trading credentials check
+
+    // function beforeSwap(
+    //     address sender,
+    //     PoolKey calldata,
+    //     IPoolManager.SwapParams calldata,
+    //     bytes calldata hookData
+    // ) external view override returns (bytes4) {
+    //     if (sender != allowedPoolOperator) {
+    //         revert NotPoolOperator();
+    //     }
+
+    //     address user = _getUserAddress(hookData);
+
+    //     if (loyaltyCredentials.balanceOf(user, TRADING_CREDENTIAL) == 0) {
+    //         revert MissingTradingCredentials();
+    //     }
+    // }
+
+    // // added a beforemodify for the liquidity licensing credentials check
+
+    // function beforeModifyPosition(
+    //     address sender,
+    //     PoolKey calldata,
+    //     IPoolManager.ModifyLiquidityParams calldata,
+    //     bytes calldata hookData
+    // ) external view override returns (bytes4) {
+    //     if (sender != allowedPoolOperator) {
+    //         revert NotPoolOperator();
+    //     }
+
+    //     address user = _getUserAddress(hookData);
+
+    //     if (loyaltyCredentials.balanceOf(user, LIQUIDITY_LICENSE) == 0) {
+    //         revert MissingLiquidityLicense();
+    //     }
+    // }
+
+    // function _getUserAddress(
+    //     bytes calldata hookData
+    // ) internal pure returns (address user) {
+    //     user = abi.decode(hookData, (address));
+    // }
+
+    // points functions
 
     function afterSwap(
         address,
@@ -97,10 +179,27 @@ contract PointsHook is BaseHook, ERC20 {
         // Mint points equivalent to how much ETH they're adding in liquidity
         uint256 pointsForAddingLiquidity = uint256(int256(-delta.amount0()));
 
+        // Store the timestamp when liquidity is added
+        liquidityAddedTimestamp[msg.sender] = block.timestamp;
+
         // Mint the points including any referral points
         _assignPoints(hookData, pointsForAddingLiquidity);
 
         return (this.afterAddLiquidity.selector, delta);
+    }
+
+    function beforeRemoveLiquidity(
+        address sender,
+        PoolKey calldata,
+        IPoolManager.ModifyLiquidityParams calldata,
+        bytes calldata
+    ) external view override returns (bytes4) {
+        // Check if the lock-up period has elapsed
+        require(
+            block.timestamp >= liquidityAddedTimestamp[sender] + MINIMUM_LOCKUP_TIME,
+            "Liquidity is still locked"
+        );
+        return this.beforeRemoveLiquidity.selector;
     }
 
     function _assignPoints(
